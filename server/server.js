@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const path = require("path");
 const mainRoutes = require("./src/routers");
 
 // config
@@ -15,6 +16,9 @@ dotenv.config({
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors());
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(__dirname, "src", "views"));
 
 // API Routes
 
