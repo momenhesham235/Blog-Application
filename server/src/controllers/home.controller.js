@@ -1,6 +1,5 @@
-const asyncWrapper = require("../middlewares/asyncWrapper");
-
-const getHome = asyncWrapper(async (req, res) => {
+const asyncHandler = require("express-async-handler");
+const getHome = asyncHandler(async (req, res) => {
   res.render("index");
 });
 

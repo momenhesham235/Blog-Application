@@ -10,7 +10,7 @@ const mainRoutes = require("./src/routers");
 dotenv.config({
   path: "src/config/.env",
 });
-// const db = require("./src/config/db");
+const db = require("./src/config/db");
 
 // middlewares
 app.use(express.json());
