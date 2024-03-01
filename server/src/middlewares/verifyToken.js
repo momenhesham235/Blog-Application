@@ -19,6 +19,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const User = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    // create new user in request
     req.user = User;
     next();
   } catch (err) {
