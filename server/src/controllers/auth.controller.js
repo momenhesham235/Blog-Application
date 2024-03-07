@@ -107,6 +107,8 @@ const loginUser = asyncHandler(async (req, res) => {
   // TODO: check if user is verified
 
   // generate JWT
+
+  console.log(user._id + " " + user.role);
   const token = await generateJWT({
     id: user._id,
     role: user.role,
@@ -117,7 +119,6 @@ const loginUser = asyncHandler(async (req, res) => {
     status: SUCCESS,
     message: "User logged in successfully",
     data: {
-      token,
       user,
     },
   });
