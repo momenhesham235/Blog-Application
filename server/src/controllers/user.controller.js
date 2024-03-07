@@ -1,8 +1,14 @@
+const path = require("path");
+const fs = require("fs");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
 const { validateUpdateUser } = require("../utils/validation/userValidation");
 const { SUCCESS, FAIL } = require("../utils/httpStatusText");
+const {
+  cloudinaryUploadImg,
+  cloudinaryDeleteImg,
+} = require("../utils/cloudinary");
 
 /**---------------------------------------
  * @desc      Get User Profile
@@ -124,9 +130,98 @@ const getUserCount = asyncHandler(async (req, res) => {
   });
 });
 
+/**---------------------------------------
+ * @desc      Profile Photo Upload
+ * @route    /api/v1/user/profile-photo
+ * @method   POST
+ * @access   Private (only logged in user can access)
+ ------------------------------------*/
+
+const profilePhotoUpload = asyncHandler(async (req, res) => {
+  // validate request body
+  if (!req.file) {
+    return res.status(400).json({
+      status: FAIL,
+      message: "Profile photo not uploaded",
+    });
+  }
+
+  // get the path of the uploaded file
+  const pathImage = path.join(__dirname, `../uploads/${req.file.filename}`);
+  console.log(pathImage);
+
+  // upload to Cloudinary
+  const result = await cloudinaryUploadImg(pathImage);
+  // console.log(result);
+
+  // get user database
+  const user = await User.findById(req.user.id);
+
+  // delete old profile photo if exists
+  if (user.publicId !== null) {
+    await cloudinaryDeleteImg(user.publicId);
+  }
+
+  // change profile photo field in database
+  user.avatar = result.secure_url;
+  user.publicId = result.public_id;
+
+  await user.save();
+
+  // return response
+  res.status(200).json({
+    status: SUCCESS,
+    message: "Profile photo uploaded successfully",
+    avatar: result.secure_url,
+    publicId: result.public_id,
+  });
+
+  // delete old profile photo server side
+  fs.unlinkSync(pathImage);
+});
+
+/**---------------------------------------
+ * @desc      Delete User Profile
+ * @route    /api/v1/user/:id
+ * @method   DELETE
+ * @access   Private (only logged in user can access & admin can delete any user)
+ ------------------------------------*/
+const deleteUserProfile = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // get user database
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(400).json({
+      status: FAIL,
+      message: "User not found",
+    });
+  }
+
+  // get all post database
+  // get the public ids of the profile photo
+  // delete profile photo from cloudinary
+
+  // delete profile photo from cloudinary
+  await cloudinaryDeleteImg(user.publicId);
+  // delete post & comments from database
+
+  //  delete user from database
+  await User.findByIdAndDelete(id);
+
+  // return response
+  res.status(200).json({
+    status: SUCCESS,
+    message: "User deleted successfully",
+    data: null,
+  });
+});
+
 module.exports = {
   getUserProfile,
   getSingleUserProfile,
   updateUserProfile,
   getUserCount,
+  profilePhotoUpload,
+  deleteUserProfile,
 };

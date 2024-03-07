@@ -4,7 +4,7 @@ const AppError = require("../utils/appError");
 const { ADMIN } = require("../utils/roles");
 
 const verifyToken = (req, res, next) => {
-  console.log(req.headers);
+  // console.log(req.headers);
   const authHeader =
     req.headers["Authorization"] || req.headers["authorization"];
 
@@ -58,7 +58,22 @@ const verifyTokenUser = (req, res, next) => {
   });
 };
 
+// verifyTokenUserOrAdmin
+const verifyTokenUserOrAdmin = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user.id === req.params.id || req.user.role === ADMIN) {
+      return next();
+    }
+    const error = AppError.create(
+      "not allowed, not your account or admin",
+      403
+    );
+  });
+};
+
 module.exports = {
+  verifyToken,
   verifyTokenAdmin,
   verifyTokenUser,
+  verifyTokenUserOrAdmin,
 };

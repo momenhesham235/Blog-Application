@@ -30,6 +30,10 @@ const userSchema = new Schema(
       type: String,
       default: "assets/images/profile.jpg",
     },
+    publicId: {
+      type: String,
+      default: null,
+    },
     bio: {
       type: String,
     },

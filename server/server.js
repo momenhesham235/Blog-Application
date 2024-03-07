@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const path = require("path");
 const mainRoutes = require("./src/routers");
+const { cloudinaryConfig } = require("./src/utils/cloudinary");
 
 // config
 dotenv.config({
@@ -19,9 +20,17 @@ app.use(cors());
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "src", "views"));
+// app.use(express.static(path.join(__dirname, "src", "uploads")));
+
+// cloudinary config
+
+cloudinaryConfig(
+  process.env.CLOUDINARY_CLOUD_NAME,
+  process.env.CLOUDINARY_API_KEY,
+  process.env.CLOUDINARY_API_SECRET
+);
 
 // API Routes
-
 mainRoutes(app);
 
 const port = process.env.PORT || 5000;
