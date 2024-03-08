@@ -60,10 +60,12 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const getSinglePost = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const post = await Post.findById(id).populate({
-    path: "user",
-    select: "-password",
-  });
+  const post = await Post.findById(id)
+    .populate({
+      path: "user",
+      select: "-password",
+    })
+    .populate({ path: "comments" });
 
   if (!post) {
     return res.status(400).json({

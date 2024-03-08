@@ -30,7 +30,6 @@ const postSchema = new Schema(
       ref: "User",
       required: true,
     },
-
     category: {
       type: String,
       required: true,
@@ -44,18 +43,20 @@ const postSchema = new Schema(
         ref: "User",
       },
     ],
-
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
   },
   {
     timestamps: true,
     versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// populate comments
+postSchema.virtual("comments", {
+  ref: "Comment",
+  foreignField: "postId",
+  localField: "_id",
+});
 
 module.exports = model("Post", postSchema);
