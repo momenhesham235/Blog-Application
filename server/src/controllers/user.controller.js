@@ -62,7 +62,7 @@ const getSingleUserProfile = asyncHandler(async (req, res) => {
 /**---------------------------------------
  * @desc      Update User Profile
  * @route    /api/v1/user/profile/:id
- * @method   Patch
+ * @method   PATCH
  * @access   Private (only user can access) 
  ------------------------------------*/
 
@@ -114,7 +114,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  ------------------------------------*/
 
 const getUserCount = asyncHandler(async (req, res) => {
-  const count = await User.count();
+  const count = await User.countDocuments();
   if (!count) {
     return res.status(400).json({
       status: FAIL,

@@ -3,8 +3,9 @@ const httpStatusText = require("../utils/httpStatusText");
 const AppError = require("../utils/appError");
 const { ADMIN } = require("../utils/roles");
 
+// verifyToken
 const verifyToken = (req, res, next) => {
-  // console.log(req.headers);
+  console.log(req.headers);
   const authHeader =
     req.headers["Authorization"] || req.headers["authorization"];
 
@@ -24,7 +25,7 @@ const verifyToken = (req, res, next) => {
     // create new user in request
     req.user = User;
     console.log(req.user);
-    next();
+    return next();
   } catch (err) {
     const error = AppError.create("invalid token", 401, httpStatusText.ERROR);
     return next(error);
