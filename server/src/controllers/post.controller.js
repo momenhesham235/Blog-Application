@@ -348,6 +348,7 @@ const toggleLike = asyncHandler(async (req, res) => {
     data: post,
   });
 });
+
 module.exports = {
   getAllPosts,
   getSinglePost,

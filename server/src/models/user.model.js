@@ -51,7 +51,16 @@ const userSchema = new Schema(
   {
     timestamps: true,
     versionKey: false,
+    toJSON: { virtuals: true }, // include all vituals
+    toObject: { virtuals: true }, // include all vituals
   }
 );
+
+// populate user with posts and comments when user is fetched
+userSchema.virtual("posts", {
+  ref: "Post", // the model to use
+  foreignField: "user", // which field in the document should be used as the foreign field
+  localField: "_id", // which field in the current model should be used as the local field
+});
 
 module.exports = model("User", userSchema);

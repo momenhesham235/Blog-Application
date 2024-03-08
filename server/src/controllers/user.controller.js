@@ -14,11 +14,11 @@ const {
  * @desc      Get User Profile
  * @route    /api/v1/user/profile
  * @method   GET
- * @access   Private (only admin can access)
+ * @access   private (only admin can access)
  ------------------------------------*/
 
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.find({}, { password: 0 });
+  const user = await User.find({}, { password: 0 }).populate("posts");
   if (!user) {
     return res.status(400).json({
       status: FAIL,
@@ -38,12 +38,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @desc      Get Single User Profile
  * @route    /api/v1/user/profile/:id
  * @method   GET
- * @access   Public 
+ * @access   public 
  ------------------------------------*/
 
 const getSingleUserProfile = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const user = await User.findById(id, { password: 0 });
+  const user = await User.findById(id, { password: 0 }).populate("posts");
   if (!user) {
     return res.status(400).json({
       status: FAIL,
@@ -63,7 +63,7 @@ const getSingleUserProfile = asyncHandler(async (req, res) => {
  * @desc      Update User Profile
  * @route    /api/v1/user/profile/:id
  * @method   PATCH
- * @access   Private (only user can access) 
+ * @access   private (only user can access) 
  ------------------------------------*/
 
 const updateUserProfile = asyncHandler(async (req, res) => {
@@ -110,7 +110,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
  * @desc      Get User count
  * @route    /api/v1/user/count
  * @method   GET
- * @access   Private (only admin can access)
+ * @access   private (only admin can access)
  ------------------------------------*/
 
 const getUserCount = asyncHandler(async (req, res) => {
@@ -134,7 +134,7 @@ const getUserCount = asyncHandler(async (req, res) => {
  * @desc      Profile Photo Upload
  * @route    /api/v1/user/profile-photo
  * @method   POST
- * @access   Private (only logged in user can access)
+ * @access   private (only logged in user can access)
  ------------------------------------*/
 
 const profilePhotoUpload = asyncHandler(async (req, res) => {
@@ -184,7 +184,7 @@ const profilePhotoUpload = asyncHandler(async (req, res) => {
  * @desc      Delete User Profile
  * @route    /api/v1/user/:id
  * @method   DELETE
- * @access   Private (only logged in user can access & admin can delete any user)
+ * @access   private (only logged in user can access & admin can delete any user)
  ------------------------------------*/
 const deleteUserProfile = asyncHandler(async (req, res) => {
   const { id } = req.params;

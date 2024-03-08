@@ -1,80 +1,73 @@
 const jwt = require("jsonwebtoken");
-const httpStatusText = require("../utils/httpStatusText");
-const AppError = require("../utils/appError");
 const { ADMIN } = require("../utils/roles");
+const { FAIL } = require("../utils/httpStatusText");
 
-// verifyToken
-const verifyToken = (req, res, next) => {
-  console.log(req.headers);
-  const authHeader =
-    req.headers["Authorization"] || req.headers["authorization"];
+// Verify Token
+function verifyToken(req, res, next) {
+  const authToken = req.headers.authorization;
 
-  if (!authHeader) {
-    const error = AppError.create(
-      "unauthorized access",
-      401,
-      httpStatusText.ERROR
-    );
-    return next(error);
+  if (authToken) {
+    const token = authToken.split(" ")[1];
+    try {
+      const decodedPayload = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      req.user = decodedPayload;
+      next();
+    } catch (error) {
+      return res
+        .status(401)
+        .json({ status: FAIL, message: "invalid token, access denied" });
+    }
+  } else {
+    return res
+      .status(401)
+      .json({ status: FAIL, message: "no token provided, access denied" });
   }
+}
 
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const User = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    // create new user in request
-    req.user = User;
-    console.log(req.user);
-    return next();
-  } catch (err) {
-    const error = AppError.create("invalid token", 401, httpStatusText.ERROR);
-    return next(error);
-  }
-};
-
-// verifyTokenAdmin
-const verifyTokenAdmin = (req, res, next) => {
+// Verify Token & Admin
+function verifyTokenAndAdmin(req, res, next) {
   verifyToken(req, res, () => {
-    console.log(req.user.role);
+    console.log(req.user);
     if (req.user.role === ADMIN) {
       return next();
+    } else {
+      return res
+        .status(403)
+        .json({ status: FAIL, message: "not allowed, only admin" });
     }
-    const error = AppError.create(
-      "You don't have permission to perform this action",
-      403
-    );
-    return next(error);
   });
-};
+}
 
-// verifyTokenUser
-const verifyTokenUser = (req, res, next) => {
+// Verify Token & Only User Himself
+function verifyTokenAndOnlyUser(req, res, next) {
   verifyToken(req, res, () => {
-    console.log(req.user);
     if (req.user.id === req.params.id) {
       return next();
+    } else {
+      return res
+        .status(403)
+        .json({ status: FAIL, message: "not allowed, only user himself" });
     }
-    const error = AppError.create("not allowed, not your account", 403);
-    return next(error);
   });
-};
+}
 
-// verifyTokenUserOrAdmin
-const verifyTokenUserOrAdmin = (req, res, next) => {
+// Verify Token & Authorization
+function verifyTokenAndAuthorization(req, res, next) {
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.role === ADMIN) {
       return next();
+    } else {
+      return res.status(403).json({
+        status: FAIL,
+        message: "not allowed, only user himself or admin",
+      });
     }
-    const error = AppError.create(
-      "not allowed, not your account or admin",
-      403
-    );
   });
-};
+}
 
 module.exports = {
   verifyToken,
-  verifyTokenAdmin,
-  verifyTokenUser,
-  verifyTokenUserOrAdmin,
+  verifyTokenAndAdmin,
+  verifyTokenAndOnlyUser,
+  verifyTokenAndAuthorization,
 };
