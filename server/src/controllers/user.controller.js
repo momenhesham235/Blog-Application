@@ -3,11 +3,14 @@ const fs = require("fs");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
+const Post = require("../models/post.model");
+const Comment = require("../models/comment.model");
 const { validateUpdateUser } = require("../utils/validation/userValidation");
 const { SUCCESS, FAIL } = require("../utils/httpStatusText");
 const {
   cloudinaryUploadImg,
   cloudinaryDeleteImg,
+  cloudinaryDeleteImgs,
 } = require("../utils/cloudinary");
 
 /**---------------------------------------
@@ -199,14 +202,27 @@ const deleteUserProfile = asyncHandler(async (req, res) => {
   }
 
   // get all post database
+  const posts = await Post.find({ user: user._id });
+
   // get the public ids of the profile photo
-  // delete profile photo from cloudinary
+  const publicIds = posts?.map((post) => {
+    return post.publicId;
+  });
+
+  // delete all posts image from cloudinary
+
+  if (publicIds?.length > 0) {
+    await cloudinaryDeleteImgs(publicIds);
+  }
 
   // delete profile photo from cloudinary
   await cloudinaryDeleteImg(user.publicId);
-  // delete post & comments from database
 
-  //  delete user from database
+  // delete post & comments from database
+  await Post.deleteMany({ user: user._id });
+  await Comment.deleteMany({ user: user._id });
+
+  // delete user from database
   await User.findByIdAndDelete(id);
 
   // return response

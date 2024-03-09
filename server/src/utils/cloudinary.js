@@ -25,10 +25,20 @@ const cloudinaryUploadImg = async (path) => {
 };
 
 // Delete an image from Cloudinary
-
 const cloudinaryDeleteImg = async (public_id) => {
   try {
     const response = await cloudinary.uploader.destroy(public_id);
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+// Delete an Multiple image from Cloudinary
+
+const cloudinaryDeleteImgs = async (public_ids) => {
+  try {
+    const response = await cloudinary.v2.api.delete_resources(public_ids);
     return response;
   } catch (error) {
     return error;
@@ -39,4 +49,5 @@ module.exports = {
   cloudinaryConfig,
   cloudinaryUploadImg,
   cloudinaryDeleteImg,
+  cloudinaryDeleteImgs,
 };

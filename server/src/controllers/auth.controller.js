@@ -16,7 +16,7 @@ const generateJWT = require("../utils/generateJWT");
  ------------------------------------*/
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
   console.log(req.body);
   // validate
   const { error } = validateRegisterUser(req.body);
@@ -45,6 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username,
     email,
     password: hashedPassword,
+    role,
   });
 
   const generateToken = await generateJWT({

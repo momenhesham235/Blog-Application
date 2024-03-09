@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const asyncHandler = require("express-async-handler");
 const Post = require("../models/post.model");
+const Comment = require("../models/comment.model");
 const {
   validateCreatePost,
   validateUpdatePost,
@@ -27,7 +28,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
   let posts;
 
   if (pageNumber) {
-    //   pagination
+    // pagination
     posts = await Post.find()
       .skip((pageNumber - 1) * POST_PER_PAGE)
       .limit(POST_PER_PAGE)
@@ -177,6 +178,8 @@ const deletePost = asyncHandler(async (req, res) => {
     await Post.findByIdAndDelete(id);
 
     // delete all comments related to the post
+
+    await Comment.deleteMany({ postId: post._id });
 
     res.status(200).json({
       status: SUCCESS,
