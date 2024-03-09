@@ -5,7 +5,7 @@ const globalError = (error, req, res, next) => {
     status: error.StatusText || ERROR,
     error: error.message,
     code: error.httpStatusCode || 500,
-    data: null,
+    stack: process.env.NODE_ENV === "production" ? null : error.stack, // for debugging  => get path of error
   });
 };
 
