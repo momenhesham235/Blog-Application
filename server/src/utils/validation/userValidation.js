@@ -5,7 +5,7 @@ const validateRegisterUser = (obj) => {
     username: joi.string().trim().min(3).max(30).required(),
     email: joi.string().trim().email().required(),
     password: joi.string().trim().min(8).required(),
-    role: joi.string().trim().required().valid("user", "admin"),
+    role: joi.string().trim().valid("user", "admin"),
   });
 
   return schema.validate(obj);
@@ -30,6 +30,7 @@ const validateUpdateUser = (obj) => {
 
   return schema.validate(obj);
 };
+
 module.exports = {
   validateRegisterUser,
   validateLoginUser,

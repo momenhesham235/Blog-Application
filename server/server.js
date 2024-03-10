@@ -16,14 +16,17 @@ const db = require("./src/config/db");
 // middlewares
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "src", "views"));
 // app.use(express.static(path.join(__dirname, "src", "uploads")));
 
 // cloudinary config
-
 cloudinaryConfig(
   process.env.CLOUDINARY_CLOUD_NAME,
   process.env.CLOUDINARY_API_KEY,
